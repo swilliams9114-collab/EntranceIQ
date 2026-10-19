@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EntranceIQ — Royal Entrances
 // @namespace    https://github.com/swilliams9114-collab/EntranceIQ
-// @version      0.1.2
+// @version      0.1.3
 // @description  Manual-send royal entrances for Torn faction chat.
 // @match        https://www.torn.com/*
 // @match        https://torn.com/*
@@ -59,9 +59,9 @@ return ranked[0]?.score>=4?ranked[0].e:null;
 function insert(){
 const e=getInput();if(!e){alert('EntranceIQ: Open faction chat first. No compatible chat field found; nothing was sent.');return}
 const existing=e.isContentEditable?e.textContent:e.value;
-if(existing?.trim()&&settings.confirmReplace&&!confirm('Replace your existing chat draft?'))return;
+const max=e.maxLength>0?e.maxLength:125;if(draft.length>max){alert('This chat allows '+max+' characters; your entrance has '+draft.length+'. Choose Short or regenerate.');return}if(existing?.trim()&&settings.confirmReplace&&!confirm('Replace your existing chat draft?'))return;
 e.focus();
-if(e.isContentEditable){e.textContent=draft;e.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:draft}))}
+if(e.isContentEditable){const selection=window.getSelection(),range=document.createRange();range.selectNodeContents(e);selection.removeAllRanges();selection.addRange(range);if(!document.execCommand('insertText',false,draft)){e.textContent=draft;e.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:draft}))}}
 else{const proto=e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(proto,'value').set.call(e,draft);e.dispatchEvent(new Event('input',{bubbles:true}))}
 e.focus();
 }
@@ -94,7 +94,30 @@ if(settings.clipboard)details.append(copy);
 const compliance=document.createElement('p');compliance.style.fontSize='12px';compliance.textContent='TOS review (not official approval): local generation — low risk; user-initiated insertion — requires live validation; automatic sending — never performed; Torn API — not used; background chat monitoring — not used. Torn staff have final authority.';
 details.append(compliance);p.append(details);document.body.append(p);generate();
 }
+// ChatIQ-style discovery: mount directly next to the faction chat composer.
+const CHAT_INPUT='textarea,[contenteditable="true"][role="textbox"],[contenteditable="true"][class*="textarea"]';
+function mountFactionButton(){
+ const inputs=[...document.querySelectorAll(CHAT_INPUT)];
+ for(const input of inputs){
+   const root=input.closest('[id^="faction-"],[id^="faction_"]');
+   if(!root||root.querySelector('.entranceiq-chat-trigger'))continue;
+   const b=document.createElement('button');b.type='button';b.className='entranceiq-chat-trigger';b.textContent='👑 EntranceIQ';b.title='Open EntranceIQ';
+   b.style.cssText='display:inline-block;padding:5px 9px;margin:4px;background:#53416b;color:white;border:1px solid #bca2dc;border-radius:6px;cursor:pointer;z-index:10';
+   b.onclick=openPanel;input.before(b);
+ }
+}
+function mountProfileSettings(){
+ if(location.pathname!=='/profiles.php')return;
+ if(document.getElementById('entranceiq-profile'))return;
+ const anchor=document.getElementById('chatiq-profile')||document.getElementById('buyiq-profile')||document.getElementById('wartargetiq-profile')||[...document.querySelectorAll('details')].find(d=>/ChatIQ Settings|BuyIQ Settings/.test(d.querySelector('summary')?.textContent||''));
+ if(!anchor?.parentNode)return;
+ const d=document.createElement('details');d.id='entranceiq-profile';d.style.cssText='clear:both;margin:12px 0;border:1px solid #777;border-radius:6px;padding:12px;background:#242424;color:#eee';
+ const summary=document.createElement('summary');summary.textContent='👑 EntranceIQ Settings · v0.1.3';d.append(summary);
+ const b=document.createElement('button');b.textContent='Open EntranceIQ';b.style.cssText='padding:9px;margin:10px;background:#53416b;color:white;border:1px solid #bca2dc;border-radius:6px';b.onclick=openPanel;d.append(b);
+ anchor.after(d);
+}
 const launch=document.createElement('button');launch.type='button';launch.id='ei-launch';launch.textContent='👑';launch.title='EntranceIQ — tap to open';launch.setAttribute('aria-label','Open EntranceIQ');launch.onclick=openPanel;
-function mount(){if(document.body&&!document.getElementById('ei-launch'))document.body.append(launch)}
-mount();new MutationObserver(mount).observe(document.documentElement,{childList:true,subtree:true});
+function mount(){if(!document.body)return;if(!document.getElementById('ei-launch'))document.body.append(launch);mountFactionButton();mountProfileSettings()}
+function start(){mount();let pending=false;new MutationObserver(()=>{if(pending)return;pending=true;setTimeout(()=>{pending=false;mount()},250)}).observe(document.body,{childList:true,subtree:true});setInterval(mount,3000)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
