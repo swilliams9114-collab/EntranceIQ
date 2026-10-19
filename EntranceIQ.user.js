@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EntranceIQ — Royal Entrances
 // @namespace    https://github.com/swilliams9114-collab/EntranceIQ
-// @version      0.1.1
+// @version      0.1.2
 // @description  Manual-send royal entrances for Torn faction chat.
 // @match        https://www.torn.com/*
 // @match        https://torn.com/*
@@ -45,7 +45,7 @@ const p=document.getElementById('ei-preview');if(p)p.textContent=draft;
 const n=document.getElementById('ei-count');if(n)n.textContent=draft.length+' characters';
 }
 const style=document.createElement('style');
-style.textContent='#ei-launch{position:fixed;right:12px;bottom:110px;z-index:2147483000;background:#292536;color:white;border:1px solid #ad9aca;border-radius:50%;width:44px;height:44px;font-size:23px;cursor:pointer;box-shadow:0 2px 12px #0008}#ei-panel{position:fixed;right:10px;bottom:165px;z-index:2147483001;width:min(380px,calc(100vw - 20px));max-height:75vh;overflow:auto;background:#20212b;color:#fff;border:1px solid #7c6a93;border-radius:12px;padding:14px;box-sizing:border-box;font:14px Arial,sans-serif;box-shadow:0 5px 24px #000a}#ei-panel *{box-sizing:border-box}#ei-panel label{display:block;margin:10px 0}#ei-panel select{display:block;width:100%;margin-top:4px}#ei-panel select,#ei-panel button{background:#383241;color:#fff;border:1px solid #82748f;border-radius:7px;padding:9px}#ei-panel button{cursor:pointer}#ei-preview{background:#302c39;padding:12px;border-radius:7px;white-space:pre-wrap;line-height:1.5;max-height:190px;overflow:auto}#ei-panel .ei-actions{display:flex;gap:7px;margin:10px 0}#ei-panel .ei-actions button{flex:1}#ei-panel small{color:#cbbfd6}';
+style.textContent='#ei-launch{position:fixed!important;left:8px!important;right:auto!important;top:40%!important;bottom:auto!important;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;z-index:2147483646!important;background:#292536;color:white;border:1px solid #ad9aca;border-radius:50%;width:44px;height:44px;font-size:23px;cursor:pointer;box-shadow:0 2px 12px #0008}#ei-panel{position:fixed;right:10px;bottom:165px;z-index:2147483001;width:min(380px,calc(100vw - 20px));max-height:75vh;overflow:auto;background:#20212b;color:#fff;border:1px solid #7c6a93;border-radius:12px;padding:14px;box-sizing:border-box;font:14px Arial,sans-serif;box-shadow:0 5px 24px #000a}#ei-panel *{box-sizing:border-box}#ei-panel label{display:block;margin:10px 0}#ei-panel select{display:block;width:100%;margin-top:4px}#ei-panel select,#ei-panel button{background:#383241;color:#fff;border:1px solid #82748f;border-radius:7px;padding:9px}#ei-panel button{cursor:pointer}#ei-preview{background:#302c39;padding:12px;border-radius:7px;white-space:pre-wrap;line-height:1.5;max-height:190px;overflow:auto}#ei-panel .ei-actions{display:flex;gap:7px;margin:10px 0}#ei-panel .ei-actions button{flex:1}#ei-panel small{color:#cbbfd6}';
 document.head.append(style);
 function getInput(){
 const elements=[...document.querySelectorAll('textarea,[contenteditable="true"],[role="textbox"],input[type="text"]')].filter(e=>!e.closest('#ei-panel')&&e.getBoundingClientRect().width>70&&getComputedStyle(e).visibility!=='hidden');
@@ -94,7 +94,7 @@ if(settings.clipboard)details.append(copy);
 const compliance=document.createElement('p');compliance.style.fontSize='12px';compliance.textContent='TOS review (not official approval): local generation — low risk; user-initiated insertion — requires live validation; automatic sending — never performed; Torn API — not used; background chat monitoring — not used. Torn staff have final authority.';
 details.append(compliance);p.append(details);document.body.append(p);generate();
 }
-const launch=document.createElement('button');launch.id='ei-launch';launch.textContent='👑';launch.title='EntranceIQ';launch.onclick=openPanel;
+const launch=document.createElement('button');launch.type='button';launch.id='ei-launch';launch.textContent='👑';launch.title='EntranceIQ — tap to open';launch.setAttribute('aria-label','Open EntranceIQ');launch.onclick=openPanel;
 function mount(){if(document.body&&!document.getElementById('ei-launch'))document.body.append(launch)}
 mount();new MutationObserver(mount).observe(document.documentElement,{childList:true,subtree:true});
 })();
