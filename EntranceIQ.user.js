@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EntranceIQ — Royal Entrances
 // @namespace    https://github.com/swilliams9114-collab/EntranceIQ
-// @version      0.1.3
+// @version      0.1.4
 // @description  Manual-send royal entrances for Torn faction chat.
 // @match        https://www.torn.com/*
 // @match        https://torn.com/*
@@ -12,6 +12,7 @@
 // ==/UserScript==
 (function(){
 'use strict';
+try {
 if(window.__entranceIQLoaded)return;window.__entranceIQLoaded=true;
 const KEY='entranceiq-settings-v1';
 const defaults={character:'sam',rating:'adult',length:'medium',roasts:true,clipboard:false,confirmReplace:true};
@@ -112,7 +113,7 @@ function mountProfileSettings(){
  const anchor=document.getElementById('chatiq-profile')||document.getElementById('buyiq-profile')||document.getElementById('wartargetiq-profile')||[...document.querySelectorAll('details')].find(d=>/ChatIQ Settings|BuyIQ Settings/.test(d.querySelector('summary')?.textContent||''));
  if(!anchor?.parentNode)return;
  const d=document.createElement('details');d.id='entranceiq-profile';d.style.cssText='clear:both;margin:12px 0;border:1px solid #777;border-radius:6px;padding:12px;background:#242424;color:#eee';
- const summary=document.createElement('summary');summary.textContent='👑 EntranceIQ Settings · v0.1.3';d.append(summary);
+ const summary=document.createElement('summary');summary.textContent='👑 EntranceIQ Settings · v0.1.4';d.append(summary);
  const b=document.createElement('button');b.textContent='Open EntranceIQ';b.style.cssText='padding:9px;margin:10px;background:#53416b;color:white;border:1px solid #bca2dc;border-radius:6px';b.onclick=openPanel;d.append(b);
  anchor.after(d);
 }
@@ -120,4 +121,9 @@ const launch=document.createElement('button');launch.type='button';launch.id='ei
 function mount(){if(!document.body)return;if(!document.getElementById('ei-launch'))document.body.append(launch);mountFactionButton();mountProfileSettings()}
 function start(){mount();let pending=false;new MutationObserver(()=>{if(pending)return;pending=true;setTimeout(()=>{pending=false;mount()},250)}).observe(document.body,{childList:true,subtree:true});setInterval(mount,3000)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+alert('EntranceIQ v0.1.4 diagnostic: script started. Look for the crown on the left edge. This notice will be removed after testing.');
+} catch(error) {
+ alert('EntranceIQ startup error: '+(error&&error.message||String(error)));
+ console.error('EntranceIQ startup error',error);
+}
 })();
